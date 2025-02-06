@@ -27,7 +27,7 @@ export const planets = {
 	},
 	[Planets.URANUS]: {
 		description: 'Uranus has a unique tilted rotation axis, with its poles pointing almost directly at the Sun.',
-		image: 'https://spaceplace.nasa.gov/all-about-uranus/sp/uranus2.sp.jpg'
+		image: 'https://hips.hearstapps.com/hmg-prod/images/uranus-1585338466.jpg'
 	},
 	[Planets.NEPTUNE]: {
 		description: 'Neptune is known for its striking blue color and is the most distant planet from the Sun.',

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ScrollView, Dimensions, View, Image, Animated, Pressable, ActivityIndicator, Text } from 'react-native';
+import { ScrollView, Dimensions, View, Image, Animated, Pressable, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { FontAwesome } from '@expo/vector-icons';
@@ -9,7 +9,7 @@ import { planets } from '@/db/solarSystem';
 import Storage from '@/utils/storage';
 import React from 'react';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const PlanetDetails = () => {
   const { id } = useLocalSearchParams();
@@ -34,7 +34,6 @@ const PlanetDetails = () => {
     ? [planets[planetQuery.data?.englishName || 'Earth'].image, ...imagesQuery.data]
     : [planets[planetQuery.data?.englishName || 'Earth'].image];
 
-  // Auto-scroll effect
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => {
@@ -47,7 +46,6 @@ const PlanetDetails = () => {
     return () => clearInterval(interval);
   }, [imageSources.length]);
 
-  // Check if the planet is a favorite on mount
   useEffect(() => {
     const checkFavoriteStatus = async () => {
       if (id) {
@@ -58,7 +56,6 @@ const PlanetDetails = () => {
     checkFavoriteStatus();
   }, [id]);
 
-  // Toggle favorite status
   const toggleFavorite = async () => {
     if (isFavorite) {
       await Storage.removeFavoritePlanet(id as string);
@@ -69,13 +66,13 @@ const PlanetDetails = () => {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <Stack.Screen options={{ title: planetQuery.data?.englishName || 'Planet' }} />
-      
+
       {planetQuery.isLoading || imagesQuery.isLoading ? (
         <ActivityIndicator size="large" />
       ) : planetQuery.error ? (
-        <Text>Error fetching planet data.</Text>
+        <Text style={{ color: '#fff'}}>Error fetching planet data.</Text>
       ) : (
         <>
           <ScrollView
@@ -88,49 +85,65 @@ const PlanetDetails = () => {
               { useNativeDriver: false }
             )}
             scrollEventThrottle={16}
-            style={{ width, height: 300 }}
+            style={{ width, height: height * 0.4 }}
           >
             {imageSources.map((img, index) => (
               <Image
                 key={index}
                 source={{ uri: img }}
-                style={{ width, height: 300, resizeMode: 'cover' }}
+                style={{ width, height: height * 0.4, resizeMode: 'cover' }}
               />
             ))}
           </ScrollView>
 
-          {/* Dots indicator */}
-          <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10, alignItems: 'center' }}>
+          <View style={styles.indicatorContainer}>
             {imageSources.map((_, index) => (
               <View
                 key={index}
-                style={{
-                  width: currentIndex === index ? 12 : 8,
-                  height: currentIndex === index ? 12 : 8,
-                  borderRadius: 6,
-                  backgroundColor: currentIndex === index ? '#333' : '#bbb',
-                  marginHorizontal: 4,
-                }}
+                style={[
+                  styles.indicatorDot,
+                  { backgroundColor: currentIndex === index ? '#fff' : '#555' },
+                ]}
               />
             ))}
           </View>
 
-          <View style={{ padding: 20 }}>
-            <Text style={{ fontSize: 26, color: '#fff', fontWeight: 'bold', marginBottom: 10 }}>
-              {planetQuery.data?.englishName}
-            </Text>
-            <Text style={{ fontSize: 16, color: '#fff' }}>
+          <View style={styles.content}>
+            <Text style={styles.title}>{planetQuery.data?.englishName}</Text>
+            <Text style={styles.description}>
               {planets[planetQuery.data?.englishName || 'Earth'].description}
             </Text>
 
-            {/* Favorites Button */}
             <View style={{ marginVertical: 20 }}>
-              <Pressable onPress={toggleFavorite} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+              <Pressable onPress={toggleFavorite} style={styles.favoriteButton}>
                 <FontAwesome name={isFavorite ? "heart" : "heart-o"} size={18} color="white" />
-                <Text style={{ color: '#fff', fontSize: 14 }}>
+                <Text style={styles.favoriteText}>
                   {isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                 </Text>
               </Pressable>
+            </View>
+
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Planet Data</Text>
+
+              <DataRow label="Mass" value={`${planetQuery.data?.mass?.massValue} × 10^${planetQuery.data?.mass?.massExponent} kg`} />
+              <DataRow label="Volume" value={`${planetQuery.data?.vol?.volValue} × 10^${planetQuery.data?.vol?.volExponent} km³`} />
+              <DataRow label="Gravity" value={`${planetQuery.data?.gravity} m/s²`} />
+              <DataRow label="Density" value={`${planetQuery.data?.density} g/cm³`} />
+              <DataRow label="Escape Velocity" value={`${planetQuery.data?.escape} m/s`} />
+              <DataRow label="Mean Radius" value={`${planetQuery.data?.meanRadius} km`} />
+              <DataRow label="Orbital Period" value={`${planetQuery.data?.sideralOrbit} days`} />
+
+              {planetQuery.data && planetQuery.data?.moons?.length > 0 && (
+                <View style={styles.moonsContainer}>
+                  <Text style={styles.moonsLabel}>Moons:</Text>
+                  <ScrollView horizontal style={styles.moonsScrollView}>
+                    <Text style={styles.moonsText}>
+                      {planetQuery.data.moons.map(moon => moon.moon).join(', ')}
+                    </Text>
+                  </ScrollView>
+                </View>
+              )}
             </View>
           </View>
         </>
@@ -138,5 +151,32 @@ const PlanetDetails = () => {
     </View>
   );
 };
+
+const DataRow = ({ label, value }: { label: string; value: string }) => (
+  <View style={styles.dataRow}>
+    <Text style={styles.dataLabel}>{label}:</Text>
+    <Text style={styles.dataValue}>{value}</Text>
+  </View>
+);
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#000' },
+  content: { padding: 20 },
+  title: { fontSize: 26, color: '#fff', fontWeight: 'bold', marginBottom: 10 },
+  description: { fontSize: 16, color: '#fff' },
+  favoriteButton: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  favoriteText: { color: '#fff', fontSize: 14 },
+  card: { borderWidth: 1, borderColor: '#888', borderRadius: 10, padding: 15, backgroundColor: '#111' },
+  cardTitle: { fontSize: 18, color: '#fff', fontWeight: 'bold', marginBottom: 10 },
+  dataRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 5 },
+  dataLabel: { color: '#bbb', fontSize: 14 },
+  dataValue: { color: '#fff', fontSize: 14 },
+  indicatorContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 10 },
+  indicatorDot: { width: 8, height: 8, borderRadius: 4, marginHorizontal: 4 },
+  moonsContainer: { marginTop: 10 },
+  moonsLabel: { color: '#bbb', fontSize: 14, marginBottom: 5 },
+  moonsScrollView: { maxHeight: 50 },
+  moonsText: { color: '#fff', fontSize: 14 },
+});
 
 export default PlanetDetails;

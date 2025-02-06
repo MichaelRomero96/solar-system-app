@@ -2,7 +2,7 @@ import { planets } from '@/db/solarSystem';
 import { IPlanet } from '@/interfaces/solarSystem';
 import { Link } from 'expo-router';
 import { FC } from 'react';
-import { View, Text, Image, Pressable } from 'react-native';
+import { Text, Image, Pressable } from 'react-native';
 
 interface Props {
   planet: IPlanet
