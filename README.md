@@ -29,16 +29,19 @@ Esta es una aplicación móvil desarrollada en React Native utilizando Expo como
 ---
 
 ## Estructura del Proyecto
-├── assets/ # Recursos estáticos (fuente)
+
+/
+├── assets/ # Recursos estáticos (imágenes, fuentes, etc.)
 ├── components/ # Componentes reutilizables
-   ├── PlanetListItem.tsx/ # Card del planeta
-   ├── PlanetsView/ # Componente que renderiza el listado de planetas
+│ ├── PlanetListItem.tsx # Card del planeta
+│ └── PlanetsView.tsx # Componente que renderiza el listado de planetas
 ├── db/ # Base de datos local con imágenes y descripciones de planetas
 ├── utils/ # Utilidades (almacenamiento local, helpers, etc.)
-├── app/ # Configuración de Expo Router y punto de entrada de la Aplicación
-   ├── (tabs)/ # Vistas principales (Planetas, Favoritos)
-   ├── [id.tsx]/ # Vista dinámica de detalle
+├── app/ # Configuración de Expo Router y punto de entrada de la aplicación
+│ ├── (tabs)/ # Vistas principales (Planetas, Favoritos)
+│ └── [id].tsx # Vista dinámica de detalle
 ├── api/ # Lógica para consumir APIs (SolarSystemAPI, PixabayAPI)
+└── README.md # Este archivo
 
 ---
 
@@ -59,8 +62,9 @@ Esta es una aplicación móvil desarrollada en React Native utilizando Expo como
 
 4. Escanea el código QR con la aplicación de Expo Go (disponible en iOS y Android) o ejecuta en un emulador.
 
+---
 
-##Dependencias Principales
+## Dependencias Principales
 Expo: Framework para desarrollo móvil con React Native.
 Expo Router: Enrutado basado en carpetas.
 TanStack Query (React Query): Para gestión de datos y caching.
