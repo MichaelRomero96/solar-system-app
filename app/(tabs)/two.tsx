@@ -1,11 +1,7 @@
-import React, { useEffect } from 'react'
-import { Text } from 'react-native'
+import PlanetsView from '@/components/PlanetsView';
 
-const Favorites = () => {
-  
+export default function TabTwoScreen() {
   return (
-    <Text>Favorites tab</Text>
-  )
-}
-
-export default Favorites;
+    <PlanetsView favoritesView />
+  );
+};
